@@ -1,0 +1,40 @@
+#!/usr/bin/python3
+# Jochen Rurländer <coding@rurlaender.net>
+# Simple python script to check if the log message starts with a given keyword.
+# If not the commit is denied .
+
+import sys, os
+
+log_ok = False
+error_msg = ""
+# Load the commit message
+if len(sys.argv) > 1:
+    with open(sys.argv[1]) as commit_msg_file:
+        log_message = commit_msg_file.read()
+    # Check log message
+    keywords = [
+        "Bufgix: ",  # If the commit fixes a bug
+        "Release: ",  # If a new release is committed
+        "Feature: ",  # If a new feature is added
+        "Midwork: ",  # If the work is not finally done
+        "Documentation: ",  # If some documentation is added
+    ]
+
+    for keyword in keywords:
+        if log_message.startswith(keyword):
+            log_ok = True
+    if not log_ok:
+        error_msg = (
+            "The commit message didn't start with one of the requested keywords \r\n"
+        )
+        error_msg += "Allowed keywords are: \r\n"
+        for keyword in keywords:
+            error_msg += '"' + keyword + '" '
+else:
+    error_msg = "No commit message found!"
+
+if log_ok:
+    exit(0)
+else:
+    print(error_msg)
+    exit(1)
